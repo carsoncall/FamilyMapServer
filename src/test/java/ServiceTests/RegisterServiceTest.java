@@ -1,2 +1,4 @@
-package ServiceTests;public class RegisterServiceTest {
+package ServiceTests;
+
+public class RegisterServiceTest {
 }

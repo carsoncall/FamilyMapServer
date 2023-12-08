@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PersonDaoTest {
     private Database db;
     private Person bestPerson;
+    private Person secondBestPerson;
     private PersonDao pDao;
 
     @BeforeEach
@@ -27,6 +30,8 @@ public class PersonDaoTest {
         // and a new event with random data
         bestPerson = new Person("bigdaddy123", "bigson 456", "Giga","Chad",
                 "m", "biggrandpa123","biggrandma123","bigmama123");
+        secondBestPerson = new Person("SnoopDawg","snoopdawg","weed","smoker",
+                "m","whoknows","whoknowsagain","themoney");
 
         // Here, we'll open the connection in preparation for the test case to use it
         Connection conn = db.getConnection();
@@ -49,7 +54,7 @@ public class PersonDaoTest {
         // Start by inserting an event into the database.
         pDao.insert(bestPerson);
         // Let's use a find method to get the event that we just put in back out.
-        Person compareTest = pDao.find(bestPerson.getPersonID());
+        Person compareTest = pDao.find(bestPerson.getPersonID(),bestPerson.getAssociatedUsername());
         // First lets see if our find method found anything at all. If it did then we know that we got
         // something back from our database.
         assertNotNull(compareTest);
@@ -74,5 +79,56 @@ public class PersonDaoTest {
         // the "()->", and the assertThrows assertion expects the code that ran to throw an
         // instance of the class in the first parameter, which in this case is a DataAccessException.
         assertThrows(DataAccessException.class, () -> pDao.insert(bestPerson));
+    }
+
+    @Test
+    public void retrievePass() throws DataAccessException {
+        //Tests if the retrieval is not simply finding the first person in the DB
+        pDao.insert(bestPerson);
+        pDao.insert(secondBestPerson);
+        Person theGuy = pDao.find(bestPerson.getPersonID(),bestPerson.getAssociatedUsername());
+        assertNotEquals(secondBestPerson,theGuy);
+        assertEquals(bestPerson,theGuy);
+    }
+
+    @Test
+    public void retrieveFail() throws DataAccessException {
+        //Tests if the retrieval returns null if the user has not been inserted
+        pDao.insert(bestPerson);
+        Person theGuy = pDao.find(secondBestPerson.getPersonID(),secondBestPerson.getAssociatedUsername());
+        assertNull(theGuy);
+    }
+
+    @Test
+    public void clearPass() throws DataAccessException {
+        // Tests that the database is clear by adding two users and then checking that both are null after .clear()
+        pDao.insert(secondBestPerson);
+        pDao.insert(bestPerson);
+
+        pDao.clear();
+
+        Person theGuy = pDao.find(bestPerson.getPersonID(),bestPerson.getAssociatedUsername());
+        Person theOtherGuy = pDao.find(secondBestPerson.getPersonID(),secondBestPerson.getAssociatedUsername());
+
+        assertNull(theGuy);
+        assertNull(theOtherGuy);
+    }
+
+    @Test
+    public void allFamilyPass() throws DataAccessException {
+        //tests whether the database will correctly find all people with an associated username
+        List<Person> personList = new ArrayList<>();
+        List<Person> testList;
+        personList.add(bestPerson);
+        secondBestPerson.setAssociatedUsername(bestPerson.getAssociatedUsername());
+        personList.add(secondBestPerson);
+        assertEquals(bestPerson.getAssociatedUsername(),secondBestPerson.getAssociatedUsername());
+
+        pDao.insert(bestPerson);
+        pDao.insert(secondBestPerson);
+
+        testList = pDao.allFamily(bestPerson.getAssociatedUsername());
+        assertNotNull(testList);
+        assertEquals(personList,testList);
     }
 }

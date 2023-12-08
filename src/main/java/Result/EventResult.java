@@ -1,7 +1,5 @@
 package Result;
 
-import Model.Event;
-
 /**
  * A container for the resulting data from EventService to return to EventHandler. Indicates success or failure.
  */

@@ -1,14 +1,21 @@
 package passoff;
 
+import client.Client;
+import client.Proxy;
+import client.ServerConnectionException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import logs.InitLogs;
 import org.junit.jupiter.api.*;
-import passoffmodels.*;
-import passoffrequest.*;
+import passoffmodels.Event;
+import passoffmodels.Person;
+import passoffmodels.User;
+import passoffrequest.FillRequest;
+import passoffrequest.LoadRequest;
+import passoffrequest.LoginRequest;
+import passoffrequest.RegisterRequest;
 import passoffresult.*;
-import client.*;
 
 import java.io.*;
 import java.net.HttpURLConnection;

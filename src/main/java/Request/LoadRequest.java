@@ -4,8 +4,6 @@ import Model.Event;
 import Model.Person;
 import Model.User;
 
-import java.util.List;
-
 /**
  * Container for the request data from the LoadHandler to give to the LoadService.
  */
